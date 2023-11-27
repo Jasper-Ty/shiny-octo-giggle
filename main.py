@@ -9,7 +9,7 @@ from data import Data
 PERM_LENGTH = 7
 D_EMB = 4 
 BATCH_SIZE = 256 
-NUM_EPOCHS = 30 
+NUM_EPOCHS = 5 
 
 transformer = Model(d_emb=D_EMB)
 
@@ -31,7 +31,6 @@ def train(model, optimizer):
     train_dataloader = data.train_dataloader(BATCH_SIZE)
 
     for src, tgt in train_dataloader:
-
         src_mask, tgt_mask = create_mask()
         logits = model(src, tgt, src_mask, tgt_mask)
 
@@ -82,7 +81,7 @@ def greedy_decode(model, src):
     memory = model.encode(src, src_mask)
     ys = torch.zeros(1, 1).type_as(src)
 
-    for _ in range(PERM_LENGTH):
+    for _ in range(10):
         tgt_mask = generate_square_subsequent_mask(ys.size(1))
         out = model.decode(ys, memory, tgt_mask)
 
@@ -99,7 +98,7 @@ def greedy_decode(model, src):
 
 
 
-test_cycle = data.line2tensor("3 5 2")
+test_cycle = data.line2tensor("3 5 2 0 1 2 3 4 5 6")
 print(test_cycle)
 
 permutation = greedy_decode(transformer, test_cycle)

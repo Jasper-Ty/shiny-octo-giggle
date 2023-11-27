@@ -1,27 +1,7 @@
 use std::fs::OpenOptions;
 use std::io::{Write, self};
 
-use rand::{seq::index::sample, thread_rng, Rng};
-
-fn rand_cycle<R>(rng: &mut R) -> Vec<u8> 
-where
-    R: Rng
-{
-    sample(rng, 7, 3)
-        .iter()
-        .map(|i| i as u8)
-        .collect()
-}
-
-fn oneline(cycle: &[u8]) -> Vec<u8> {
-    let mut v: Vec<u8> = (0..7).collect();
-
-    v[cycle[0] as usize] = cycle[1];
-    v[cycle[1] as usize] = cycle[2];
-    v[cycle[2] as usize] = cycle[0];
-
-    v
-}
+use rand::{seq::{index::sample, SliceRandom}, thread_rng, Rng};
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
@@ -42,6 +22,25 @@ fn main() -> io::Result<()> {
 }
 
 
+
+fn rand_cycle<R>(rng: &mut R) -> Vec<u8> 
+where
+    R: Rng
+{
+    sample(rng, 7, 3)
+        .iter()
+        .map(|i| i as u8)
+        .collect()
+}
+
+fn act(permutation: &mut[u8], cycle: &[u8]) {
+    let tmp = permutation[cycle[0] as usize];
+    permutation[cycle[0] as usize] = permutation[cycle[1] as usize];
+    permutation[cycle[1] as usize] = permutation[cycle[2] as usize];
+    permutation[cycle[2] as usize] = tmp;
+}
+
+
 fn gen(n: usize, filename: &str) -> io::Result<()> {
     let mut rng = thread_rng();
 
@@ -53,18 +52,18 @@ fn gen(n: usize, filename: &str) -> io::Result<()> {
 
     for _ in 0..n {
         let cycle = rand_cycle(&mut rng);
+        let mut permutation: Vec<u8> = (0..7).collect();
+        permutation.shuffle(&mut rng);
+
         for i in &cycle {
             write!(f, "{} ", i)?;
         }
-        for i in 0..7 {
+        for i in &permutation {
             write!(f, "{} ", i)?;
         }
         write!(f, "\n")?;
 
-        let permutation = oneline(&cycle[..]); 
-        for i in &cycle {
-            write!(f, "{} ", i)?;
-        }
+        act(&mut permutation[..], &cycle[..]); 
         for i in &permutation {
             write!(f, "{} ", i)?;
         }

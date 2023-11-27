@@ -48,7 +48,6 @@ class PositionalEncoding(nn.Module):
 
 
 class Model(nn.Module):
-    #TODO change hyperparameters away from magic numbers
     def __init__(self, d_emb=4, perm_length=7):
         super(Model, self).__init__()
 
@@ -60,6 +59,7 @@ class Model(nn.Module):
             dim_feedforward=2048,
             batch_first=True,
         )
+
         self.generator = nn.Linear(d_emb, perm_length)
         self.src_emb = nn.Embedding(perm_length, d_emb)
         self.tgt_emb = nn.Embedding(perm_length, d_emb)
@@ -92,8 +92,8 @@ def generate_square_subsequent_mask(sz):
 
 
 def create_mask():
-    src_seq_len = 3
-    tgt_seq_len = 7
+    src_seq_len = 10
+    tgt_seq_len = 7 
 
     tgt_mask = generate_square_subsequent_mask(tgt_seq_len)
     src_mask = torch.zeros((src_seq_len, src_seq_len)).type(torch.bool)

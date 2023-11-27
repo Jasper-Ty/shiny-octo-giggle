@@ -30,10 +30,9 @@ class Data:
             it = iter (f)
 
             for _, line in enumerate(it):
-                split = line.split()
+                cycle = self.line2tensor(line)
+                permutation = self.line2tensor(next(it))
 
-                cycle = torch.tensor([tok2idx[tok] for tok in split[0:3]]).reshape(1, -1)
-                permutation = torch.tensor([tok2idx[tok] for tok in split[3:10]]).reshape(1, -1)
                 src.append(cycle)
                 tgt.append(permutation)
 
